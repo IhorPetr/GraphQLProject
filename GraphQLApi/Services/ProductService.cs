@@ -1,49 +1,46 @@
-﻿using GraphQLApi.Interfaces;
+﻿using GraphQLApi.Data;
+using GraphQLApi.Interfaces;
 using GraphQLApi.Models;
 
 namespace GraphQLApi.Services
 {
     public class ProductService : IProduct
     {
-        private static List<Product> products = new List<Product>()
-        { 
-            new Product() 
-            { 
-                Id = 0,
-                Name = "Coffe",
-                Price = 45.6        
-            },
-            new Product()
-            {
-                Id = 0,
-                Name = "Tea",
-                Price = 23
-            }
-        };
+        private GraphQLDbContext graphQLDbContext;
+        public ProductService(GraphQLDbContext graphQLDbContext)
+        {
+            this.graphQLDbContext = graphQLDbContext;
+        }
         public Product AddProduct(Product product)
         {
-            products.Add(product);
+            graphQLDbContext.Product.Add(product);
+            graphQLDbContext.SaveChanges();
             return product;
         }
 
         public void DeleteProduct(int id)
         {
-            products.RemoveAt(id);
+            var productObj = graphQLDbContext.Product.Find(id);
+            graphQLDbContext.Product.Remove(productObj);
+            graphQLDbContext.SaveChanges();
         }
 
         public List<Product> GetAllProduct()
         {
-            return products;
+            return graphQLDbContext.Product.ToList();
         }
 
         public Product GetProductById(int id)
         {
-            return products.Find(x => x.Id == id);
+            return graphQLDbContext.Product.Find(id);
         }
 
         public Product UpdateProduct(int id, Product product)
         {
-            products[id] = product;
+            var productObj = graphQLDbContext.Product.Find(id);
+            productObj.Name = product.Name;
+            productObj.Price = product.Price;
+            graphQLDbContext.SaveChanges();
             return product;
         }
     }
