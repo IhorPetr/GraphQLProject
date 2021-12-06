@@ -13,31 +13,31 @@ namespace GraphQLApi.Services
         }
         public Product AddProduct(Product product)
         {
-            graphQLDbContext.Product.Add(product);
+            graphQLDbContext.Products.Add(product);
             graphQLDbContext.SaveChanges();
             return product;
         }
 
         public void DeleteProduct(int id)
         {
-            var productObj = graphQLDbContext.Product.Find(id);
-            graphQLDbContext.Product.Remove(productObj);
+            var productObj = graphQLDbContext.Products.Find(id);
+            graphQLDbContext.Products.Remove(productObj);
             graphQLDbContext.SaveChanges();
         }
 
         public List<Product> GetAllProduct()
         {
-            return graphQLDbContext.Product.ToList();
+            return graphQLDbContext.Products.ToList();
         }
 
         public Product GetProductById(int id)
         {
-            return graphQLDbContext.Product.Find(id);
+            return graphQLDbContext.Products.Find(id);
         }
 
         public Product UpdateProduct(int id, Product product)
         {
-            var productObj = graphQLDbContext.Product.Find(id);
+            var productObj = graphQLDbContext.Products.Find(id);
             productObj.Name = product.Name;
             productObj.Price = product.Price;
             graphQLDbContext.SaveChanges();

@@ -14,23 +14,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddTransient<IProduct, ProductService>();
-builder.Services.AddSingleton<ProductType>();
-builder.Services.AddSingleton<ProductQuery>();
-builder.Services.AddSingleton<ProductMutation>();
-builder.Services.AddSingleton<ISchema, ProductSchema>();
+builder.Services.AddTransient<ProductType>();
+builder.Services.AddTransient<ProductQuery>();
+builder.Services.AddTransient<ProductMutation>();
+builder.Services.AddTransient<ISchema, ProductSchema>();
 
 builder.Services.AddGraphQL(options => 
 {
     options.EnableMetrics = false;
 }).AddSystemTextJson();
-builder.Services.AddControllers();
-builder.Services.AddDbContext<GraphQLDbContext>(options => options.UseSqlServer(@"Data Source = localhost\SQLEXPRESS;Initial Catalog = GraphQLDb;Integrated Security = True"));
+
+builder.Services.AddDbContext<GraphQLDbContext>(options => options.UseSqlServer(@"Data Source= localhost\SQLEXPRESS;Initial Catalog=GraphQLDb;Integrated Security = True"));
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-var graphQLDbContext = app.Services.GetService<GraphQLDbContext>();
-graphQLDbContext.Database.EnsureCreated();
+using (var scope = app.Services.CreateScope())
+{
+    var graphQLDbContext = scope.ServiceProvider.GetRequiredService<GraphQLDbContext>();
+    graphQLDbContext.Database.EnsureCreated();
+}
 app.UseGraphiQl("/graphql");
 app.UseGraphQL<ISchema>();
 app.Run();
